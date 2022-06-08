@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <script type = "text/javascript">
+  
+        const ws = new WebSocket("ws://192.168.1.75/ws");
+ 
+        ws.onopen = function() {
+            alert("Connection opened");
+        };
+        
+        ws.onclose = function() {
+            alert("Connection closed");
+        };
+        
+        ws.onmessage = function(event) {
+ 
+            const p = document.createElement('p');
+            p.textContent = event.data;
+            document.body.appendChild(p);
+         
+        };
+        console.log('date') 
+      </script>
+  
+   </head>
+   <label for="Latitud">Latitude (4 to 8 characters):</label>
+
+    <input type="text" id="Latitude" name="Latitud" required
+       minlength="4" maxlength="8" size="10">
+    <div>
+    <label for="Longitud">Longitud (4 to 8 characters):</label>
+
+    <input type="text" id="name" name="Longitud" required
+       minlength="4" maxlength="8" size="10">
+    
+    </div>
+    <label for="start">Date:</label>
+    <input type="date" id="start" name="trip-start"
+              value="2018-07-22"
+              min="2018-01-01" max="2022-12-31">
+       
+    <p>
+    <button>Submit</button>
+    </p>
+   <body>      
+   </body>
+</html>
