@@ -21,7 +21,7 @@ double ki = 2;
 int dt = 10.000;  
 int pwmconvers= 255/5;
 
-int target = 1200;
+
 void setup() {
   Serial.begin(9600);
   pinMode(pin_salida,OUTPUT);
@@ -31,7 +31,7 @@ void setup() {
 }
 
 void loop() {
-  
+  int target = Serial.read();
   entrada=analogRead(pin_entrada)/204.6; // 1023/5 = 204.6
   entrada2=analogRead(pin_entradaB)/204.6;
  
