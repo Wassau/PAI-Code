@@ -24,7 +24,6 @@ void loop() {
   void loop() {
 
   // set target position
-  //int target = 1200;
   int target = Serial.read();
 
   
@@ -67,7 +66,7 @@ void loop() {
     dir = -1;
   }
 
-  // signal the motor
+  // signal to the motor
   setMotor(dir,pwr,PWM,dirpin);
 
 
