@@ -21,7 +21,6 @@ void setup() {
  
 void loop() {
   // read the sensor value:
-  void loop() {
 
   // set target position
   int target = Serial.read();
