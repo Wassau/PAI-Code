@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Heliodon - auto</title>
+    <link rel="stylesheet" href="css/default.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/functions.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Proyecto Helidon</h1>
+    </header>
+    <form>
+        <div>
+            <input type="button" class="input" onclick="window.location.href='menu.html';" value="Volver a menu">
+        </div>
+        <div>
+            <input type="radio" class="input" id="IsMoveManual" name="type_move" value="manual" onclick="window.location.href='manual.html';">
+            <label for="IsMoveManual">Manual</label>
+            <input type="radio" id="IsMoveAuto" name="type_move" value="automatico" checked="checked" >
+            <label for="IsMoveAuto">Automatico</label><br><br>
+        </div>
+        <div>
+            <label for="simulateDayCheckBox"><input type="checkbox" id="simulateDayCheckBox" value="first_checkbox" onclick="simulateDay()"> Simular dia</label><br>
+        </div>
+        <div>
+            <label for="lat">Latitud:</label>
+            <!--   pattern="[^(\-?([0-8]?[0-9](\.\d+)?|90(.[0]+)?)\s?[,]\s?)+(\-?([1]?[0-7]?[0-9](\.\d+)?|180((.[0]+)?)))$]" -->
+            <input type="number" min="-80" max="80" step='0.001' id="lat" class="input" name="lat" value="4.637"  required><br>
+        </div>
+        <div>
+            <label for="lng">Longitud:</label>
+            <input type="number" min="-170" max="170" step='0.001' id="lng" class="input" name="lng" value="-74.083" required>
+            <br><br>
+        </div>
+
+        <label for="current_day">Fecha:</label>
+        <input type="date" class="input" id="current_day" name="current_day" required><br><br>
+        </div>
+        <div>
+            <label for="current_time">Tiempo:</label>
+            <input type="time" min="06:10" max="17:50" class="input" id="current_time" name="current_day" required><br><br>
+        </div>
+        <div>
+            <label for="comboBoxLocations" disabled="disabled">Elegir zona horaria:</label>
+            <select name="comboBoxLocations" id="comboBoxLocations" disabled="disabled">
+                <option value="Bogotá">Bogotá (4.637,-74.083)</option>
+                <option value="Ecuador">Ecuador (0,0)</option>
+                <option value="Capricornio">Trópico de Capricornio (-23.438,0)</option>
+                <option value="Cancer">Trópico de Cancer (23.437,0)</option>
+            </select>
+        </div>
+        <div>
+            <input type="hidden" id="constant" name="custId" value="3487">
+            <input type="submit" value="Enter">
+        </div>
+    </form>
+    <footer>
+        <p>Universidad Nacional de Colombia Sede Bogotá</p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Heliodon - manual</title>
+  <link rel="stylesheet" href="css/default.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/functions.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>Proyecto Helidon</h1>
+  </header>
+  <form>
+    <div>
+      <input type="button" onclick="window.location.href='menu.html';" value="Volver a menu">
+    </div>
+    <div>
+      <input type="radio" id="move_manual" name="type_move" value="manual" checked="checked">
+      <label for="move_manual">Manual</label>
+      <input type="radio" id="move_auto" name="type_move" value="automatico"
+        onclick="window.location.href='auto.html';">
+      <label for="move_auto">Automatico</label><br><br>
+    </div>
+    <div>
+      <input type="button" onclick="manualBtnEvent(this)" value="Norte">
+    </div>
+    <div>
+      <input type="button" onclick="manualBtnEvent(this)" value="Este">
+      <input type="button" onclick="manualBtnEvent(this)" value="Oeste">
+    </div>
+    <div>
+      <input type="button" onclick="manualBtnEvent(this)" value="Sur">
+    </div>
+    <div class="results">
+      <label id="labelVelActual">Velocidad actual: </label><br>
+      <label id="labelOriActual">Azimut actual: </label><br>
+      <label id="labelAltActual">Altitud actual: </label><br>
+    </div>
+  </form>
+  <footer>
+    <p>Universidad Nacional de Colombia Sede Bogotá</p>
+  </footer>
+  <script>
+    setLabels();
+  </script>
+</body>
+
+</html>
