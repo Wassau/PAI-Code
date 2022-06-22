@@ -46,20 +46,25 @@
 #define IN4 32
 
 // pins joystick
-#define pinJoystickX 4
-#define pinJoystickY 15
+//#define pinJoystickX 4
+//#define pinJoystickY 15
+
 
 // pins potenciometer
 #define pinPot 35
-#define pinCalibration 16
+#define pinCalibration 21
 
 // pins  button
-#define EMERGENCY_BUTTON_PIN 22
-#define pinGreenBtn 21
+//#define EMERGENCY_BUTTON_PIN 22
+#define pinGreenBtn 22
 #define BUZZER_PIN 27
+#define pinNorthRed 15
+#define pinWestYellow 16
+#define pinSouthBlue 4
+#define pinEastGreen 34
 
 // pins DC motor
-#define pinDCMotorDriveEn 13
+#define pinDCMotorDriveEn 2
 #define pinDCMotorDriveIN1 12
 #define pinDCMotorDriveIN2 14
 
@@ -118,7 +123,7 @@ double potValueAngle_offset = 0;
 volatile int potDegreeAngle = 0;
 float EMA_a = 0.6;      //initialization of EMA alpha
 int EMA_S = 0;          //initialization of EMA S
-const int sizeArray = 10;
+const int sizeArray = 2;
 int EMA_S_array[sizeArray];
 int counter = 0;
 volatile int potRealAngle = 0;
@@ -130,10 +135,15 @@ const int diameterCarGear = 24; // mm
 
 // EMERGENCY
 bool IS_EMERGENCY = false;
-int EMERGENCY_BUTTON_PIN_STATE = HIGH; // negative logic
+//int EMERGENCY_BUTTON_PIN_STATE = HIGH; // negative logic
 bool isCalibrated = false;
-int greenBtnState = HIGH; // negative logic
 bool calibrationLedState = LOW;
+int greenBtnState = HIGH; // negative logic
+
+volatile int pinNorthRedState = HIGH;
+volatile int pinWestYellowState = HIGH;
+volatile int pinSouthBlueState = HIGH;
+volatile int pinEastGreenState = HIGH;
 
 
 Stepper myStepper(stepsPerRevolution, IN1, IN3, IN2, IN4); // initialize the stepper library
@@ -149,14 +159,22 @@ void setup() {
   pinMode(pinCalibration, OUTPUT);
   pinMode(pinDCMotorDriveIN1, OUTPUT);
   pinMode(pinDCMotorDriveIN2, OUTPUT);
+  pinMode(pinDCMotorDriveEn, OUTPUT);
   pinMode(pinGreenBtn, INPUT_PULLUP);
-  attachInterrupt(EMERGENCY_BUTTON_PIN, ISR_EMERGENCY, FALLING);
+  pinMode(pinNorthRed, INPUT_PULLUP);
+  pinMode(pinWestYellow, INPUT_PULLUP);
+  pinMode(pinSouthBlue, INPUT_PULLUP);
+  pinMode(pinEastGreen, INPUT_PULLUP);
+
+  //attachInterrupt(EMERGENCY_BUTTON_PIN, ISR_EMERGENCY, FALLING);
+  attachInterrupt(pinNorthRed, ISR_btnNorthRed, FALLING);
+  attachInterrupt(pinWestYellow, ISR_btnWestYellow, FALLING);
+  attachInterrupt(pinSouthBlue, ISR_btnSouthBlue, FALLING);
+  attachInterrupt(pinEastGreen, ISR_btnEastGreen, FALLING);
   ledcSetup(dcMotorChannel, freq, resolution);
   ledcAttachPin(pinDCMotorDriveEn, dcMotorChannel);
   myStepper.setSpeed(5); // set the speed at 5 rpm
   setIsManual(true);
-
-
 }
 
 void loop() {
@@ -167,6 +185,7 @@ void loop() {
     potToAngleUpdate();
     if (counter == -1) {
       if (getIsManual()) {
+        Serial.println(F("is manual"));
         manualMov();
       } else {
         automaticMov(42.05, 297.38);
@@ -182,12 +201,14 @@ void loop() {
 //*******************************************
 
 void potToAngleUpdate() {
+  //btnsUpdateState();
   potValue = analogRead(pinPot);
   EMA_S = (EMA_a * potValue) + ((1 - EMA_a) * EMA_S); //run the EMA                         //print digital value to serial
   potValue = EMA_S * 100 / analogInputMax; // 0 - 100
   potValueAngle = map(potValue, 0, 100, (-290 / 2) + 17, (290 / 2) + 17);
   potDegreeAngle = (int)potValueAngle / 1.15 ; //  1.15 is the angle to degrees constan that I got from experimentation
   EMA_S_array[counter] = potDegreeAngle;
+
 
   if (counter == (sizeArray - 1)) {
     counter = -1;
@@ -224,33 +245,67 @@ int average() {
 /////////////////////////////////////////////
 //////////// Type of movement ///////////////
 /////////////////////////////////////////////
+
+void btnsUpdateState() {
+
+  pinNorthRedState = digitalRead(pinNorthRedState);
+  delay(15);
+  pinWestYellowState = digitalRead(pinWestYellowState);
+  delay(15);
+  pinSouthBlueState = digitalRead(pinSouthBlueState);
+  delay(15);
+  pinEastGreenState = digitalRead(pinEastGreenState);
+  delay(15);
+
+  Serial.print(F("pinNorthRedState: "));
+  Serial.println(pinNorthRedState);
+  Serial.print(F("pinWestYellowState: "));
+  Serial.println(pinWestYellowState);
+  Serial.print(F("pinSouthBlueState: "));
+  Serial.println(pinSouthBlueState);
+  Serial.print(F("pinEastGreenState: "));
+  Serial.println(pinEastGreenState);
+}
 void manualMov() {
-  int joystick_offset = 150;
-  // offset jaystick -> mapX: 78 mapY: 95
-  joystickXvalue = analogRead(pinJoystickX);
-  joystickYvalue = analogRead(pinJoystickY);
-  mapX = map(joystickXvalue, 0, analogInputMax, (-analogInputMax - 800 / 2 ), (analogInputMax - 800 / 2 ));
-  Serial.print(F("mapX: "));
-  Serial.print(mapX);
-  if ((mapX > joystick_offset) || (mapX < -joystick_offset)) {
-    if (numOfTeethMoved < 30 && numOfTeethMoved > -30) {
-      unsigned long time_o = millis() ;
-      pwmMov((255 / 4) * mapX / (analogInputMax / 2));
-      unsigned long time_f = millis() ;
-      //numOfTeethMovedUpdate(time_o, time_f, (255 / 4) * mapX / (analogInputMax / 2));
-    }
+  
+}
+
+void xorIF(){
+  if( (pinNorthRedState == LOW && pinSouthBlueState == HIGH) || (pinNorthRedState == HIGH && pinSouthBlueState == LOW) ){
+    (pinNorthRedState == LOW) ? motorArcMov(1) : motorArcMov(-1);
   }
-  mapY = map(joystickYvalue, 0, analogInputMax, -255, 255);
-  Serial.print(F(" mapY: "));
-  Serial.println(mapY);
-  if (mapY > joystick_offset && potRealAngle <= 80) { //&& encoderValue <= 4 North to south is positive
-    motorArcMov(1);
-  }
-  if (mapY < -joystick_offset && potRealAngle >= -80) { // && encoderValue >= -4
-    motorArcMov(-1);
+
+  if( (pinWestYellowState == LOW && pinEastGreenState == HIGH) || (pinWestYellowState == HIGH && pinEastGreenState == LOW) ){
+    (pinWestYellowState == LOW) ? pwmMov(255) : pwmMov(-255);
   }
 }
 
+//void joystickFun() {
+//  int joystick_offset = 150;
+//  // offset jaystick -> mapX: 78 mapY: 95
+//  joystickXvalue = analogRead(pinJoystickX);
+//  joystickYvalue = analogRead(pinJoystickY);
+//  mapX = map(joystickXvalue, 0, analogInputMax, (-analogInputMax - 800 / 2 ), (analogInputMax - 800 / 2 ));
+//  Serial.print(F("mapX: "));
+//  Serial.print(mapX);
+//  if ((mapX > joystick_offset) || (mapX < -joystick_offset)) {
+//    if (numOfTeethMoved < 30 && numOfTeethMoved > -30) {
+//      unsigned long time_o = millis() ;
+//
+//      unsigned long time_f = millis() ;
+//      //numOfTeethMovedUpdate(time_o, time_f, (255 / 4) * mapX / (analogInputMax / 2));
+//    }
+//  }
+//  mapY = map(joystickYvalue, 0, analogInputMax, -255, 255);
+//  Serial.print(F(" mapY: "));
+//  Serial.println(mapY);
+//  if (mapY > joystick_offset && potRealAngle <= 80) { //&& encoderValue <= 4 North to south is positive
+//    motorArcMov(1);
+//  }
+//  if (mapY < -joystick_offset && potRealAngle >= -80) { // && encoderValue >= -4
+//    motorArcMov(-1);
+//  }
+//}
 
 void automaticMov(float elNextInput, float azNextInput) {
   setNextPos(elNextInput, azNextInput);
@@ -322,11 +377,23 @@ int pulsesPerN() {
 }
 
 void pwmMov(int dutyCycle) {
-  digitalWrite(pinDCMotorDriveIN1, HIGH);
-  digitalWrite(pinDCMotorDriveIN2, HIGH);
+  //  digitalWrite(pinDCMotorDriveIN1, HIGH);
+  //  digitalWrite(pinDCMotorDriveIN2, HIGH);
   (dutyCycle > 0) ? setMovDCMotorForward() : setMovDCMotorBackwards();
-  ledcWrite(dcMotorChannel, abs(dutyCycle));
-  delay(15);
+
+  for(int i = 0; i <= 50; i++){
+    ledcWrite(dcMotorChannel, abs(i));
+  }
+//  for(int i = 100; i <= 200; i++){
+//    ledcWrite(dcMotorChannel, abs(i));
+//  }
+//  for(int i = 200; i >= 100; i--){
+//    ledcWrite(dcMotorChannel, abs(i));
+//  }
+  for(int i = 50; i >= 0; i--){
+    ledcWrite(dcMotorChannel, abs(i));
+  }
+  //delay(15);
 }
 
 void numOfTeethMovedUpdate(unsigned long time_o, unsigned long time_f, int dutyCycle) {
@@ -392,7 +459,24 @@ void updateValues() {
   u_carActual = u_carNext;
 }
 
-// interruptions
+//////////////////
+// interruptions /
+//////////////////
+void ISR_btnNorthRed() {
+  motorArcMov(1);
+}
+void ISR_btnWestYellow() {
+  pwmMov(255);
+  delay(100);
+}
+void ISR_btnSouthBlue() {
+  motorArcMov(-1);
+}
+void ISR_btnEastGreen() {
+  pwmMov(-255);
+  delay(100);
+}
+
 void ISR_EMERGENCY() {
   //(digitalRead(EMERGENCY_BUTTON_PIN_STATE) == LOW) ? IS_EMERGENCY = true : IS_EMERGENCY = IS_EMERGENCY;
   IS_EMERGENCY = true;
