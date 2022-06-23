@@ -79,7 +79,7 @@ void loop() {
 }
   int sensorReading = analogRead(SPEED_CONTROL);
   // map it to a range from 0 to 100:
-  int motorSpeed = map(sensorReading, 0, 1023, 0, 100);
+  int motorSpeed = map(sensorReading, 0, 1023, 0, 100); //4025 en ESP32
   // set the motor speed:
   if (motorSpeed > 0) {
     Nema23.setSpeed(motorSpeed); // PWM
