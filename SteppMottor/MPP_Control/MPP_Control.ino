@@ -89,23 +89,23 @@ void loop() {
   Serial.print(pos);
   Serial.println();
 }
-void setmotor(int dirPin, int Duty){
-  if (dirPin == 1){
-    // Set motor direction clockwise
-      for(int x = 0; x < STEPS_PER_REV ; x++) { // one rotation
-        digitalWrite(PULSE,LOW);
-        delayMicroseconds(Duty);
-        digitalWrite(PULSE,HIGH);
-        delayMicroseconds(Duty);
-      }
-  }
-      else {
-   // Set motor direction counterclockwise
-      for(int x = 0; x < STEPS_PER_REV ; x++) { // one rotation
-        digitalWrite(PULSE,HIGH);
-        delayMicroseconds(Duty);
-        digitalWrite(PULSE,LOW);
-        delayMicroseconds(Duty);
-      }
-  }
- }
+  void setmotor(int dirPin, int Duty){
+    if (dirPin == 1){
+      // Set motor direction clockwise
+        for(int x = 0; x < STEPS_PER_REV ; x++) { // one rotation
+          digitalWrite(PULSE,LOW);
+          delayMicroseconds(Duty);
+          digitalWrite(PULSE,HIGH);
+          delayMicroseconds(Duty);
+        }
+    }
+        else {
+     // Set motor direction counterclockwise
+        for(int x = 0; x < STEPS_PER_REV ; x++) { // one rotation
+          digitalWrite(PULSE,HIGH);
+          delayMicroseconds(Duty);
+          digitalWrite(PULSE,LOW);
+          delayMicroseconds(Duty);
+        }
+    }
+   }
