@@ -5,7 +5,7 @@
   modified by Daniel Delgado 11/06/2022
 *********/
 
-#include <Stepper.h>
+#include <ESP_FlexyStepper.h>
 #include "Arduino.h"
 /*
   // pin definitions
@@ -203,7 +203,7 @@ void setupMotors() {
   //attachInterrupt(EMERGENCY_BUTTON_PIN, ISR_EMERGENCY, FALLING);
   ledcSetup(dcMotorChannel, freq, resolution);
   ledcAttachPin(pinDCMotorDriveEn, dcMotorChannel);
-    ledcSetup(dcMotorChannel, freq2, resolution2);
+    ledcSetup(MPPChannel, freq2, resolution2);
   ledcAttachPin(PULSE, MPPChannel);
    // set the speed at 5 rpm
   setIsManual(true);

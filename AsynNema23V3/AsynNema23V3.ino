@@ -106,6 +106,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(Limcarro), Limitcarro, RISING);
   attachInterrupt(digitalPinToInterrupt(Limcarro), Limitarco, RISING);
   setupMotors();
+  digitalWrite(DIR_STPM, HIGH);
+  pinMode(EN_STPM,LOW);
+
   disableCore1WDT();
 
   // just an update to progress
@@ -254,6 +257,11 @@ void convertions() {
   Serial.println(elNext);
   Serial.print(F("azNext: "));
   Serial.println(azNext);
+
+
+  ///////////////////////////////
+  // MOVIMIENTO MOTOR DE ARCO
+  //////////////////////////////
   int numStepsArcAux = numStepsArc() * 20;
   Serial.print(F("numStepsArcAux: "));
   Serial.println(numStepsArcAux);
@@ -261,9 +269,11 @@ void convertions() {
   Serial.print(F("motorArcMov: "));
   if (numStepsArcAux > 0) {
     for (int i = 0; i < numStepsArcAux; i++) {
-      //myStepper.step(1);
+      digitalWrite(PULSE, LOW);
+      digitalWrite(PULSE, HIGH);
+      delayMicroseconds(60);
       Serial.println(i);
-      
+
     }
   } else {
     for (int i = 0; i > numStepsArcAux; i--) {
@@ -272,6 +282,11 @@ void convertions() {
 
     }
   }
+
+  ///////////////////////////////
+  // MOVIMIENTO MOTOR DC
+  //////////////////////////////
+
   //int numPulsesCarAux = numPulsesCar();
   int numPulsesCarAux = -20;
   Serial.print(F("numPulsesCarAux: "));
@@ -283,7 +298,7 @@ void convertions() {
     for (int i = 0; i < numPulsesCarAux; i++) {
       ledcWrite(dcMotorChannel, 255);
       Serial.println(i);
-      
+
     }
     stopDCMotor();
   } else {
@@ -291,7 +306,7 @@ void convertions() {
     for (int i = 0; i > numPulsesCarAux; i--) {
       ledcWrite(dcMotorChannel, 255);
       Serial.println(i);
-      
+
     }
     stopDCMotor();
   }
@@ -314,22 +329,34 @@ void readEncoder() {
 void manualMov() {
 
   if (moveR) {
-    digitalWrite(DIR_STPM, HIGH);
-    digitalWrite (EN_STPM, HIGH);
-     ledcWrite(MPPChannel, 100);
+//    digitalWrite(DIR_STPM, HIGH);
+//    digitalWrite (EN_STPM, HIGH);
+//    ledcWrite(MPPChannel, 100);
+    pinMode(DIR_STPM, HIGH);
+    digitalWrite(PULSE, LOW);
+    digitalWrite(PULSE, HIGH);
+    delayMicroseconds(60);
+
     moveR = false;
   }
   if (moveL) {
-    digitalWrite(DIR_STPM, LOW);
-    digitalWrite (EN_STPM, HIGH);
-    for (int x = 0; x < 100 ; x++) { // define CCW or CW rotation
-      digitalWrite(PULSE, HIGH);
-      delayMicroseconds(100);
-      digitalWrite(PULSE, LOW);
-      delayMicroseconds(100);
-    }
-    ledcWrite(MPPChannel, 100);
-    delay(20);
+//    digitalWrite(DIR_STPM, LOW);
+//    digitalWrite (EN_STPM, HIGH);
+//    //    for (int x = 0; x < 100 ; x++) { // define CCW or CW rotation
+//    //      digitalWrite(PULSE, HIGH);
+//    //      digitalWrite (EN_STPM, HIGH);
+//    //      delayMicroseconds(100);
+//    //      digitalWrite(PULSE, LOW);
+//    //      digitalWrite (EN_STPM, LOW);
+//    //      delayMicroseconds(100);
+//    //    }
+//    ledcWrite(MPPChannel, 100);
+//    delay(20);
+
+    pinMode(DIR_STPM, LOW);
+    digitalWrite(PULSE, LOW);
+    digitalWrite(PULSE, HIGH);
+    delayMicroseconds(60);
     moveL = false;
   }
   if (moveforwards) {
@@ -340,7 +367,7 @@ void manualMov() {
     delay(100);
     digitalWrite(pinDCMotorDriveIN1, LOW );
     digitalWrite(pinDCMotorDriveIN2,  LOW);
-    
+
     moveforwards = false;
   }
   if (moveback) {
